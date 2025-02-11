@@ -79,7 +79,7 @@ function Details() {
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <h6>Liberty NFT Market</h6>
+              <h6>Pixie NFT Market</h6>
               <h2>View Item Details</h2>
               <span>Home  <a href="#">Item Details</a></span>
               <div className="buttons">
@@ -166,7 +166,7 @@ function Details() {
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <p>Copyright © 2022 <a href="#">Liberty</a> NFT Marketplace Co., Ltd. All rights reserved.
+              <p>Copyright © 2022 <a href="#">Pixie</a> NFT Marketplace Co., Ltd. All rights reserved.
                 &nbsp;&nbsp;
                 Designed by <a title="facebook" rel="sponsored" href="https://www.facebook.com/profile.php?id=100011213104178" target="_blank">Nguyendinhdung</a>
               </p>

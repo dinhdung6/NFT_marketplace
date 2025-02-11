@@ -76,7 +76,7 @@ function Explore() {
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <h6>Liberty NFT Market</h6>
+              <h6>Pixie NFT Market</h6>
               <h2>Discover Some Top Items</h2>
               <span>
                 Home  <a href="#">Explore</a>
@@ -96,7 +96,7 @@ function Explore() {
           <div className="row">
             <div className="col-lg-12">
               <p>
-                Copyright © 2025 Liberty NFT Market.
+                Copyright © 2025 Pixie NFT Market.
                 <br />
                 Design: <a href="#">Nguyendinhdung</a>
               </p>

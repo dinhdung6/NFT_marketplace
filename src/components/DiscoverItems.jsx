@@ -1,7 +1,44 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
+
 
 
 const DiscoverItems = () => {
+  const [keyword, setKeyword] = useState("");
+  const [category, setCategory] = useState("");
+  const [price, setPrice] = useState("")
+  const [items, setItems] = useState([
+    // Mock data representing items
+    { id: 1, title: "Twin Item", category: "Digital", price: "Ending-Soon", type: "twin", items: [
+        { id: "2a", title: "Mutant Ape Bored", itemImg: "assets/images/discover-01.jpg", authorImg: "assets/images/author.jpg" },
+        { id: "2b", title: "His Other Half", itemImg: "assets/images/discover-02.jpg", authorImg: "assets/images/author.jpg" }
+      ], currentBid: "8.16 ETH", collection: "2/2", endsIn: "25th Nov", category: "Digital Art"
+    },
+    { id: 2, title: "His Other Half", category: "Digital", price: "Ending-Soon", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-03.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
+    { id: 3, title: "Genesis Meta Boom", category: "Music", price: "Available", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-04.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
+    { id: 4, title: "Pixel Sand Box", category: "Blockchain", price: "Coming-Soon", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-05.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
+    { id: 5, title: "Invisible NFT Land", category: "Virtual", price: "Closed", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-06.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
+    { id: 6, title: "Another Half Ape", category:"Digital", price:"Closed", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-05.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
+    { id: 7, title: "Another Half Ape", category:"Digital", price:"Closed", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-04.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" }
+  ]);
+  const [filteredItems, setFilteredItems] = useState(items);
+  useEffect(() => {
+    // Filter logic
+    const filtered = items.filter((item) => {
+      const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword.toLowerCase());
+      const matchesCategory = !category || item.category === category || category === "All";
+      const matchesPrice = !price || item.price === price;
+      
+      return matchesKeyword && matchesCategory && matchesPrice;
+    });
+    setFilteredItems(filtered);
+  }, [keyword, category, price, items]);
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted with:", { keyword, category, price });
+    // Filtering logic is handled in useEffect
+  };
+
   return (
     
     <div className="discover-items">
@@ -180,20 +217,20 @@ const DiscoverItems = () => {
             <div className="section-heading">
               <div className="line-dec"></div>
               <h2>Discover Some Of Our <em>Items</em>.</h2>
-            </div>
+            </div> 
           </div>
           <div className="col-lg-7">
-            <form id="search-form" name="gs" method="submit" role="search" action="#">
+            <form id="search-form" onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-lg-4">
                   <fieldset>
-                    <input type="text" name="keyword" className="searchText" placeholder="Type Something..." autoComplete="on" required />
+                    <input type="text" name="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="searchText" placeholder="Type Something..." autoComplete="on" required />
                   </fieldset>
                 </div>
                 <div className="col-lg-3">
                   <fieldset>
-                    <select name="Category" className="form-select">
-                      <option selected>All Categories</option>
+                    <select name="Category" value={category} onChange={(e) => setCategory(e.target.value)} className="form-select">
+                      <option selected value="All">All Categories</option>
                       <option value="Music">Music</option>
                       <option value="Digital">Digital</option>
                       <option value="Blockchain">Blockchain</option>
@@ -203,7 +240,7 @@ const DiscoverItems = () => {
                 </div>
                 <div className="col-lg-3">
                   <fieldset>
-                    <select name="Price" className="form-select">
+                    <select name="Price" value={price} onChange={(e)=> setPrice(e.target.value)} className="form-select">
                       <option selected>Available</option>
                       <option value="Ending-Soon">Ending Soon</option>
                       <option value="Coming-Soon">Coming Soon</option>
@@ -213,369 +250,158 @@ const DiscoverItems = () => {
                 </div>
                 <div className="col-lg-2">
                   <fieldset>
-                    <button className="main-button">Search</button>
+                    <button className="main-button" type="submit" >Search</button>
                   </fieldset>
                 </div>
               </div>
             </form>
           </div>
 
-          {/* Single Items */}
-          <div className="col-lg-6">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="banner">Double Item</span>
-                </div>
-                <div className="col-lg-6 col-sm-6">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-01.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Mutant Ape Bored</h4>
-                </div>
-                <div className="col-lg-6 col-sm-6">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-02.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>His Other Half</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-lg-3 col-sm-6">
-                        <span>
-                        Current Bid: <br /> <strong>8.16 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-lg-3 col-sm-6">
-                        <span>
-                        Category: <br /> <strong>Digital Art</strong>
-                        </span>
-                    </div>
-                    <div className="col-lg-3 col-sm-6">
-                        <span>
-                        Collection: <br /> <strong>2/2</strong>
-                        </span>
-                    </div>
-                    <div className="col-lg-3 col-sm-6">
-                        <span>
-                        Ends In: <br /> <strong>25th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            <div className="col-lg-3">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-03.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Genesis Meta Boom</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-6">
-                        <span>
-                        Current Bid: <br /> <strong>5.15 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-6">
-                        <span>
-                        Ends In: <br /> <strong>26th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            <div className="col-lg-3">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-04.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Another Half Ape</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-6">
-                        <span>
-                        Current Bid: <br /> <strong>3.63 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-6">
-                        <span>
-                        Ends In: <br /> <strong>24th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            <div className="col-lg-3">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-03.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Pixel Sand Box</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-6">
-                        <span>
-                        Current Bid: <br /> <strong>4.68 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-6">
-                        <span>
-                        Ends In: <br /> <strong>28th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            <div className="col-lg-3">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-04.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Another Half Ape</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-6">
-                        <span>
-                        Current Bid: <br /> <strong>2.03 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-6">
-                        <span>
-                        Ends In: <br /> <strong>25th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            <div className="col-lg-3">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-06.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Invisible NFT Land</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-6">
-                        <span>
-                        Current Bid: <br /> <strong>2.03 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-6">
-                        <span>
-                        Ends In: <br /> <strong>25th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            <div className="col-lg-3">
-            <div className="item">
-                <div className="row">
-                <div className="col-lg-12">
-                    <span className="author">
-                    <img
-                        src="assets/images/author.jpg"
-                        alt=""
-                        style={{
-                        maxWidth: "50px",
-                        maxHeight: "50px",
-                        borderRadius: "50%",
-                        }}
-                    />
-                    </span>
-                    <img
-                    src="assets/images/discover-05.jpg"
-                    alt=""
-                    style={{ borderRadius: "20px" }}
-                    />
-                    <h4>Another Half Ape</h4>
-                </div>
-                <div className="col-lg-12">
-                    <div className="line-dec"></div>
-                    <div className="row">
-                    <div className="col-6">
-                        <span>
-                        Current Bid: <br /> <strong>2.64 ETH</strong>
-                        </span>
-                    </div>
-                    <div className="col-6">
-                        <span>
-                        Ends In: <br /> <strong>25th Nov</strong>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-                <div className="col-lg-12">
-                    <div className="main-button">
-                    <a href="/details">View Details</a>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-
-
-          {/* Additional Items */}
-          {/* Add additional items in the same structure here */}
+          
+  
+          <div className="row">
+          {filteredItems.map((item) =>
+            item.type === "single" ? (
+              <ItemCard
+                key={item.id}
+                title={item.title}
+                category={item.category}
+                price={item.price}
+                authorImg={item.authorImg}
+                itemImg={item.itemImg}
+                currentBid={item.currentBid}
+                endsIn={item.endsIn}
+              />
+            ) : (
+              <TwinItemCard
+                key={item.id}
+                items={item.items}
+                currentBid={item.currentBid}
+                category={item.category}
+                collection={item.collection}
+                endsIn={item.endsIn}
+              />
+            )
+          )}
         </div>
+ 
+
+          
+        </div>
+
       </div>
     </div>
   );
 };
 
+
+
 export default DiscoverItems;
+
+const ItemCard = ({ title, category, price, authorImg, itemImg, currentBid, endsIn }) => {
+  return (
+    <div className="col-lg-3">
+      <div className="item" data-category={category} data-price={price}>
+        <div className="row">
+          <div className="col-lg-12">
+            <span className="author">
+              <img
+                src={authorImg}
+                alt=""
+                style={{
+                  maxWidth: "50px",
+                  maxHeight: "50px",
+                  borderRadius: "50%",
+                }}
+              />
+            </span>
+            <img
+              src={itemImg}
+              alt=""
+              style={{ borderRadius: "20px" }}
+            />
+            <h4>{title}</h4>
+          </div>
+          <div className="col-lg-12">
+            <div className="line-dec"></div>
+            <div className="row">
+              <div className="col-6">
+                <span>
+                  Current Bid: <br /> <strong>{currentBid}</strong>
+                </span>
+              </div>
+              <div className="col-6">
+                <span>
+                  Ends In: <br /> <strong>{endsIn}</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-12">
+            <div className="main-button">
+              <a href="/details">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+const TwinItemCard = ({ items = [], currentBid, category, collection, endsIn }) => (
+  <div className="col-lg-6">
+    <div className="item">
+      <div className="row">
+        <div className="col-lg-12">
+          <span className="banner">Double Item</span>
+        </div>
+        {items.map((item, index) => (
+          <div key={index} className="col-lg-6 col-sm-6">
+            <span className="author">
+              <img
+                src={item.authorImg}
+                alt={item.title}
+                style={{ maxWidth: "50px", maxHeight: "50px", borderRadius: "50%" }}
+              />
+            </span>
+            <img
+              src={item.itemImg}
+              alt={item.title}
+              style={{ borderRadius: "20px" }}
+            />
+            <h4>{item.title}</h4>
+          </div>
+        ))}
+        <div className="col-lg-12">
+          <div className="line-dec"></div>
+          <div className="row">
+            <div className="col-lg-3 col-sm-6">
+              <span>
+                Current Bid: <br /> <strong>{currentBid}</strong>
+              </span>
+            </div>
+            <div className="col-lg-3 col-sm-6">
+              <span>
+                Category: <br /> <strong>{category}</strong>
+              </span>
+            </div>
+            <div className="col-lg-3 col-sm-6">
+              <span>
+                Collection: <br /> <strong>{collection}</strong>
+              </span>
+            </div>
+            <div className="col-lg-3 col-sm-6">
+              <span>
+                Ends In: <br /> <strong>{endsIn}</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="col-lg-12">
+          <div className="main-button">
+            <a href="/details">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);

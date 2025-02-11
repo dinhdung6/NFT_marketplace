@@ -60,6 +60,7 @@ function Home() {
                             <li>
                             <a href="/create">Create Yours</a>
                             </li>
+                            
                         </ul>
 
                         {/* The button to trigger the menu */}
@@ -83,12 +84,12 @@ function Home() {
                 <div className="row">
                     <div className="col-lg-6 align-self-center">
                     <div className="header-text">
-                        <h6>Liberty NFT Market</h6>
+                        <h6>Pixie NFT Market</h6>
                         <h2>Create, Sell &amp; Collect Top NFT’s.</h2>
                         <p>
-                        Liberty NFT Market is a really cool and professional design
+                        Pixie NFT Market is a really cool and professional design
                         for your NFT websites. This  is based on
-                        Bootstrap v5 from Nguyendinhdung's 
+                        Bootstrap v5. 
                         </p>
                         <div className="buttons">
                         <div className="border-button">
@@ -135,7 +136,7 @@ function Home() {
                                 </div>
                                 <h4>{category}</h4>
                                 <div className="icon-button">
-                                <a href="#" >
+                                <a href="/explore" >
                                     <i className="fa fa-angle-right"></i>
                                 </a>
                                 </div>
@@ -212,7 +213,7 @@ function Home() {
                 <div className="row">
                     <div className="col-lg-12">
                     <p>
-                        Copyright © 2022 <a href="#">Liberty</a> NFT Marketplace Co.,
+                        Copyright © 2022 <a href="#">Pixie</a> NFT Marketplace Co.,
                         Ltd. All rights reserved. &nbsp;&nbsp;Designed by{" "}
                         <a
                         title="facebook"

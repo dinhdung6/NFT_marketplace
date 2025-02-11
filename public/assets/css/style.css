@@ -466,10 +466,14 @@ Header Style
   z-index: 99;
   right: 20px;
   display: none;
+  border: none;
+  background-color: transparent;
 }
 
 .background-header .main-nav .menu-trigger {
   top: 17px;
+  border: none;
+  background-color: transparent;
 }
 
 .header-area .main-nav .menu-trigger span,
@@ -556,6 +560,7 @@ Header Style
 
 .background-header .main-nav .menu-trigger.active span:before {
   background-color: #7453fc;
+  
 }
 
 .header-area .main-nav .menu-trigger.active span:after {

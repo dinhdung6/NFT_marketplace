@@ -43,8 +43,8 @@ const MarketItem = () => {
       image: "assets/images/market-01.jpg",
       title: "Music Art Super Item",
       authorImg: "assets/images/author.jpg",
-      authorName: "Liberty Artist",
-      authorHandle: "@libertyart",
+      authorName: "Pixie Artist",
+      authorHandle: "@Pixieart",
       bid: "2.03 ETH",
       bidValue: "$8,240.50",
       endsIn: "4D 08H 15M 42S",
@@ -56,8 +56,8 @@ const MarketItem = () => {
       image: "assets/images/market-01.jpg",
       title: "Digital Crypto Artwork",
       authorImg: "assets/images/author.jpg",
-      authorName: "Liberty Artist",
-      authorHandle: "@libertyart",
+      authorName: "Pixie Artist",
+      authorHandle: "@Pixieart",
       bid: "2.03 ETH",
       bidValue: "$7,200.50",
       endsIn: "2D 06H 30M 25S",
@@ -69,8 +69,8 @@ const MarketItem = () => {
       image: "assets/images/market-01.jpg",
       title: "Blockchain Item One",
       authorImg: "assets/images/author.jpg",
-      authorName: "Liberty Artist",
-      authorHandle: "@libertyart",
+      authorName: "Pixie Artist",
+      authorHandle: "@Pixieart",
       bid: "3.64 ETH",
       bidValue: "$6,600.00",
       endsIn: "6D 05H 40M 50S",
@@ -82,8 +82,8 @@ const MarketItem = () => {
       image: "assets/images/market-01.jpg",
       title: "Virtual Currency Art",
       authorImg: "assets/images/author.jpg",
-      authorName: "Liberty Artist",
-      authorHandle: "@libertyart",
+      authorName: "Pixie Artist",
+      authorHandle: "@Pixieart",
       bid: "2.44 ETH",
       bidValue: "$8,800.50",
       endsIn: "3D 05H 20M 58S",
@@ -95,8 +95,8 @@ const MarketItem = () => {
       image: "assets/images/market-01.jpg",
       title: "Digital Art Item",
       authorImg: "assets/images/author.jpg",
-      authorName: "Liberty Artist",
-      authorHandle: "@libertyart",
+      authorName: "Pixie Artist",
+      authorHandle: "@Pixieart",
       bid: "2.50 ETH",
       bidValue: "$8,400.50",
       endsIn: "4D 08H 32M 18S",
@@ -108,8 +108,8 @@ const MarketItem = () => {
       image: "assets/images/market-01.jpg",
       title: "Blockchain Music Design",
       authorImg: "assets/images/author.jpg",
-      authorName: "Liberty Artist",
-      authorHandle: "@libertyart",
+      authorName: "Pixie Artist",
+      authorHandle: "@Pixieart",
       bid: "2.44 ETH",
       bidValue: "$8,200.50",
       endsIn: "5D 10H 22M 24S",
@@ -177,7 +177,7 @@ const MarketItem = () => {
                           <h6>
                             {item.authorName}
                             <br />
-                            <a href="#">{item.authorHandle}</a>
+                            <a href="/author">{item.authorHandle}</a>
                           </h6>
                         </span>
                         <div className="line-dec"></div>
