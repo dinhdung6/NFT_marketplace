@@ -110,7 +110,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          A futuristic digital masterpiece that blends vibrant neon hues with a dystopian cityscape, capturing the essence of cyberpunk culture in mesmerizing detail.
           </p>
           <div className="row">
             <div className="col-3">
@@ -176,7 +176,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          A retro-inspired NFT that pays homage to classic 8-bit and 16-bit aesthetics, evoking memories of old-school video games with a modern twist.
           </p>
           <div className="row">
             <div className="col-3">
@@ -242,7 +242,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          A mind-bending fusion of human creativity and artificial intelligence, generating hypnotic and otherworldly digital art that feels both alien and familiar.
           </p>
           <div className="row">
             <div className="col-3">
@@ -308,7 +308,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          Cosmic swirls, vibrant nebulas, and shimmering stardust come together in this mesmerizing NFT that transports viewers beyond the limits of reality.
           </p>
           <div className="row">
             <div className="col-3">
@@ -374,7 +374,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          An intricate NFT artwork depicting mythical creatures and enchanted landscapes, immersing collectors in a hauntingly beautiful fantasy world.
           </p>
           <div className="row">
             <div className="col-3">
@@ -440,7 +440,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          A stunning digital illusion that blurs the line between virtual and reality, creating an immersive experience that evolves with every glance.
           </p>
           <div className="row">
             <div className="col-3">
@@ -506,7 +506,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          A dynamic explosion of fragmented pixels, distorted visuals, and digital noise that captures the beauty of imperfection in the digital age.
           </p>
           <div className="row">
             <div className="col-3">
@@ -572,7 +572,7 @@ const ItemDetails = () => {
             </h6>
           </span>
           <p>
-            Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          A ghostly, dreamlike composition with soft pastel tones and fluid motion, evoking a sense of serenity and transcendence.
           </p>
           <div className="row">
             <div className="col-3">
