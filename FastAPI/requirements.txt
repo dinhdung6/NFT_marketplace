@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+mysql-connector-python
+sqlalchemy
+databases
+python-dotenv
+web3
+pymysql
+aiomysql
+ipfshttpclient

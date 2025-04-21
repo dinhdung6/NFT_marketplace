@@ -5,8 +5,7 @@ import $ from "jquery";
 import "owl.carousel";
 import BannerCarousel from '../components/BannerCarousel';
 import CollectionCarousel from '../components/CollectionCarousel';
-import MarketItem from '../components/MarketItem';
-
+import axios from 'axios';
 
 function Home() {
     const [isActive, setIsActive] = useState(false);
@@ -16,9 +15,11 @@ function Home() {
         setIsActive(!isActive); // Toggle the 'active' class
         setIsMenuVisible(!isMenuVisible); // Toggle menu visibility
     };
+
   return (
     
             <div>
+            
             {/* ***** Preloader Start ***** */}
             <div id="js-preloader" className="js-preloader">
                 <div className="preloader-inner">
@@ -77,7 +78,7 @@ function Home() {
                 </div>
             </header>
             {/* ***** Header Area End ***** */}
-
+            
             {/* ***** Main Banner Area Start ***** */}
             <div className="main-banner">
                 <div className="container">
@@ -110,7 +111,7 @@ function Home() {
                 </div>
             </div>
             {/* ***** Main Banner Area End ***** */}
-
+            
             <div className="categories-collections">
                 <div className="container">
                 <div className="row">
@@ -207,7 +208,7 @@ function Home() {
                 </div>
                 </div>
 
-            <MarketItem/>
+            
             <footer>
                 <div className="container">
                 <div className="row">

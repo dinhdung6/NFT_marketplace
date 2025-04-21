@@ -1,43 +1,74 @@
 import React, {useState, useEffect} from "react";
+import axios from "axios";
 
-
-
+const truncateWallet = (wallet) => {
+  return wallet ? `${wallet.slice(0, 6)}...${wallet.slice(-4)}` : "";
+};
 const DiscoverItems = () => {
   const [keyword, setKeyword] = useState("");
-  const [category, setCategory] = useState("");
-  const [price, setPrice] = useState("")
-  const [items, setItems] = useState([
-    // Mock data representing items
-    { id: 1, title: "Twin Item", category: "Digital", price: "Ending-Soon", type: "twin", items: [
-        { id: "2a", title: "Mutant Ape Bored", itemImg: "assets/images/discover-01.jpg", authorImg: "assets/images/author.jpg" },
-        { id: "2b", title: "His Other Half", itemImg: "assets/images/discover-02.jpg", authorImg: "assets/images/author.jpg" }
-      ], currentBid: "8.16 ETH", collection: "2/2", endsIn: "25th Nov", category: "Digital Art"
-    },
-    { id: 2, title: "His Other Half", category: "Digital", price: "Ending-Soon", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-03.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
-    { id: 3, title: "Genesis Meta Boom", category: "Music", price: "Available", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-04.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
-    { id: 4, title: "Pixel Sand Box", category: "Blockchain", price: "Coming-Soon", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-05.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
-    { id: 5, title: "Invisible NFT Land", category: "Virtual", price: "Closed", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-06.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
-    { id: 6, title: "Another Half Ape", category:"Digital", price:"Closed", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-05.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" },
-    { id: 7, title: "Another Half Ape", category:"Digital", price:"Closed", type: "single" , authorImg: "assets/images/author.jpg", itemImg: "assets/images/discover-04.jpg", currentBid: "5.00 ETH", endsIn: "20th Nov" }
-  ]);
-  const [filteredItems, setFilteredItems] = useState(items);
+  const [category, setCategory] = useState("All");
+  const [status, setStatus] = useState("");
+  const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   useEffect(() => {
-    // Filter logic
-    const filtered = items.filter((item) => {
-      const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword.toLowerCase());
-      const matchesCategory = !category || item.category === category || category === "All";
-      const matchesPrice = !price || item.price === price;
-      
-      return matchesKeyword && matchesCategory && matchesPrice;
-    });
-    setFilteredItems(filtered);
-  }, [keyword, category, price, items]);
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted with:", { keyword, category, price });
-    // Filtering logic is handled in useEffect
+    
+    const fetchNFTs = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/nfts");
+        const nfts = response.data.map((nft) => ({
+          id: nft.id,
+          title: nft.item_name,
+          category: nft.category,
+          authorImg: nft.author_image,
+          authorName: nft.author,
+          itemImg: nft.img_url,
+          currentBid: `${nft.current_bid} ${nft.currency}`,
+          endsIn: new Date(nft.bidding_end_time),
+          ownerWallet: truncateWallet(nft.owner_wallet),
+          status: getStatus(nft.bidding_end_time),
+        }));
+
+        setItems(nfts);
+        setFilteredItems(nfts);
+
+        const uniqueCategories = [
+          "All",
+          ...new Set(nfts.map((nft) => nft.category)),
+        ];
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching NFTs:", error);
+      }
+    };
+
+    fetchNFTs();
+  }, []);
+  const getStatus = (biddingEndTime) => {
+    const now = new Date();
+    const endTime = new Date(biddingEndTime);
+    const timeDiff = endTime - now;
+
+    if (timeDiff <= 0) return "Closed";
+    if (timeDiff <= 24 * 60 * 60 * 1000) return "Ending-Soon";
+    return "Available";
   };
+  useEffect(() => {
+    const filtered = items.filter((item) => {
+      const matchesKeyword =
+        !keyword || item.title.toLowerCase().includes(keyword.toLowerCase());
+      const matchesCategory =
+        category === "All" || item.category === category;
+      const matchesStatus = !status || item.status === status;
+
+      return matchesKeyword && matchesCategory && matchesStatus;
+    });
+
+    setFilteredItems(filtered);
+  }, [keyword, category, status, items]);
+  
+  
 
   return (
     
@@ -220,7 +251,7 @@ const DiscoverItems = () => {
             </div> 
           </div>
           <div className="col-lg-7">
-            <form id="search-form" onSubmit={handleSubmit}>
+            <form id="search-form">
               <div className="row">
                 <div className="col-lg-4">
                   <fieldset>
@@ -230,20 +261,20 @@ const DiscoverItems = () => {
                 <div className="col-lg-3">
                   <fieldset>
                     <select name="Category" value={category} onChange={(e) => setCategory(e.target.value)} className="form-select">
-                      <option selected value="All">All Categories</option>
-                      <option value="Music">Music</option>
-                      <option value="Digital">Digital</option>
-                      <option value="Blockchain">Blockchain</option>
-                      <option value="Virtual">Virtual</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
                     </select>
                   </fieldset>
                 </div>
                 <div className="col-lg-3">
                   <fieldset>
-                    <select name="Price" value={price} onChange={(e)=> setPrice(e.target.value)} className="form-select">
-                      <option selected>Available</option>
+                    <select name="Price" value={status} onChange={(e) => setStatus(e.target.value)} className="form-select">
+                      <option value="">All Status</option>
+                      <option value="Available">Available</option>
                       <option value="Ending-Soon">Ending Soon</option>
-                      <option value="Coming-Soon">Coming Soon</option>
                       <option value="Closed">Closed</option>
                     </select>
                   </fieldset>
@@ -260,31 +291,14 @@ const DiscoverItems = () => {
           
   
           <div className="row">
-          {filteredItems.map((item) =>
-            item.type === "single" ? (
-              <ItemCard
-                key={item.id}
-                title={item.title}
-                category={item.category}
-                price={item.price}
-                authorImg={item.authorImg}
-                itemImg={item.itemImg}
-                currentBid={item.currentBid}
-                endsIn={item.endsIn}
-              />
-            ) : (
-              <TwinItemCard
-                key={item.id}
-                items={item.items}
-                currentBid={item.currentBid}
-                category={item.category}
-                collection={item.collection}
-                endsIn={item.endsIn}
-              />
-            )
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item) => (
+              <ItemCard key={item.id} {...item} />
+            ))
+          ) : (
+            <p>No items found</p>
           )}
         </div>
- 
 
           
         </div>
@@ -298,16 +312,16 @@ const DiscoverItems = () => {
 
 export default DiscoverItems;
 
-const ItemCard = ({ title, category, price, authorImg, itemImg, currentBid, endsIn }) => {
+const ItemCard = ({ title, category, currentBid, itemImg, endsIn, status, ownerWallet, authorImg, authorName }) => {
   return (
     <div className="col-lg-3">
-      <div className="item" data-category={category} data-price={price}>
+      <div className="item">
         <div className="row">
           <div className="col-lg-12">
             <span className="author">
               <img
-                src={authorImg}
-                alt=""
+                src={authorImg} 
+                alt={authorName}
                 style={{
                   maxWidth: "50px",
                   maxHeight: "50px",
@@ -317,7 +331,7 @@ const ItemCard = ({ title, category, price, authorImg, itemImg, currentBid, ends
             </span>
             <img
               src={itemImg}
-              alt=""
+              alt={title}
               style={{ borderRadius: "20px" }}
             />
             <h4>{title}</h4>
@@ -332,7 +346,7 @@ const ItemCard = ({ title, category, price, authorImg, itemImg, currentBid, ends
               </div>
               <div className="col-6">
                 <span>
-                  Ends In: <br /> <strong>{endsIn}</strong>
+                  Ends In: <br /> <strong>{endsIn.toLocaleString()}</strong>
                 </span>
               </div>
             </div>
@@ -347,61 +361,3 @@ const ItemCard = ({ title, category, price, authorImg, itemImg, currentBid, ends
     </div>
   );
 };
-const TwinItemCard = ({ items = [], currentBid, category, collection, endsIn }) => (
-  <div className="col-lg-6">
-    <div className="item">
-      <div className="row">
-        <div className="col-lg-12">
-          <span className="banner">Double Item</span>
-        </div>
-        {items.map((item, index) => (
-          <div key={index} className="col-lg-6 col-sm-6">
-            <span className="author">
-              <img
-                src={item.authorImg}
-                alt={item.title}
-                style={{ maxWidth: "50px", maxHeight: "50px", borderRadius: "50%" }}
-              />
-            </span>
-            <img
-              src={item.itemImg}
-              alt={item.title}
-              style={{ borderRadius: "20px" }}
-            />
-            <h4>{item.title}</h4>
-          </div>
-        ))}
-        <div className="col-lg-12">
-          <div className="line-dec"></div>
-          <div className="row">
-            <div className="col-lg-3 col-sm-6">
-              <span>
-                Current Bid: <br /> <strong>{currentBid}</strong>
-              </span>
-            </div>
-            <div className="col-lg-3 col-sm-6">
-              <span>
-                Category: <br /> <strong>{category}</strong>
-              </span>
-            </div>
-            <div className="col-lg-3 col-sm-6">
-              <span>
-                Collection: <br /> <strong>{collection}</strong>
-              </span>
-            </div>
-            <div className="col-lg-3 col-sm-6">
-              <span>
-                Ends In: <br /> <strong>{endsIn}</strong>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="col-lg-12">
-          <div className="main-button">
-            <a href="/details">View Details</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);

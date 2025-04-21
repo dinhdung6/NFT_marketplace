@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
+import axios from "axios";
 
 const FeatureExplore = () => {
+  const [nftItems, setNftItems] = useState([]);
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/top-nfts/") // Fetch top NFTs from FastAPI
+      .then((response) => setNftItems(response.data))
+      .catch((error) => console.error("Error fetching NFTs:", error));
+  }, []);
   const settings = {
     dots: true,
     infinite: true,
@@ -27,37 +35,11 @@ const FeatureExplore = () => {
       },
     ],
   };
-
-  const items = [
-    {
-      image: "assets/images/featured-01.jpg",
-      title: "Triple Mutant Ape Bored",
-      authorImage: "assets/images/author.jpg",
-      authorName: "Pixie Artist",
-      authorLink: "@Pixieart",
-    },
-    {
-      image: "assets/images/featured-02.jpg",
-      title: "Bored Ape Kennel Club",
-      authorImage: "assets/images/author.jpg",
-      authorName: "Pixie Artist",
-      authorLink: "@Pixieart",
-    },
-    {
-      image: "assets/images/featured-03.jpg",
-      title: "Genesis Club by KMT",
-      authorImage: "assets/images/author.jpg",
-      authorName: "Pixie Artist",
-      authorLink: "@Pixieart",
-    },
-    {
-      image: "assets/images/featured-04.jpg",
-      title: "Crypto Aurora Guy",
-      authorImage: "assets/images/author.jpg",
-      authorName: "Pixie Artist",
-      authorLink: "@Pixieart",
-    },
-  ];
+// Function to truncate wallet address (show first 6 characters)
+  const truncateWallet = (wallet) => {
+    return wallet ? `${wallet.substring(0, 15)}...` : "N/A";
+  };
+  
 
   return (
     <div>
@@ -84,6 +66,7 @@ const FeatureExplore = () => {
             display: inline-block;
             width: 100%;
             max-width: 400px;
+            max-height: 380px;
             transition: transform 0.3s ease-in-out;
           }
 
@@ -150,22 +133,21 @@ const FeatureExplore = () => {
       <div className="featured-explore">
         <div className="container-fluid">
           <Slider {...settings}>
-            {items.map((item, index) => (
-              <div key={index} className="item">
+          {nftItems.map((item) => (
+              <div key={item.id} className="item">
                 <div className="thumb">
-                  <img src={item.image} alt={item.title} />
+                  <img src={item.img_url} alt={item.item_name} />
                   <div className="hover-effect">
                     <div className="content">
-                      <h4>{item.title}</h4>
+                      <h4>{item.item_name}</h4>
                       <span className="author">
                         <img
-                          src={item.authorImage}
-                          alt={item.authorName}
+                          src={item.author_image} alt={item.author}
                         />
                         <h6>
-                          {item.authorName}
+                          {item.author}
                           <br />
-                          <a href="#">{item.authorLink}</a>
+                          <a href="#">{truncateWallet(item.author_wallet)}</a>
                         </h6>
                       </span>
                     </div>

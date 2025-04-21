@@ -1,46 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import Slider from 'react-slick';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CollectionCarousel = () => {
-  const collections = [
-    {
-      id: 1,
-      title: "Mutant Bored Ape Yacht Club",
-      image: "assets/images/collection-01.jpg",
-      items: "310/340",
-      category: "Digital Crypto",
-      exploreLink: "/explore",
-      buttonText: "Explore Mutant"
-    },
-    {
-      id: 2,
-      title: "Bored Ape Kennel Club",
-      image: "assets/images/collection-01.jpg",
-      items: "324/324",
-      category: "Visual Art",
-      exploreLink: "/explore",
-      buttonText: "Explore Bored Ape"
-    },
-    {
-      id: 3,
-      title: "Genesis Collective Statue",
-      image: "assets/images/collection-01.jpg",
-      items: "380/394",
-      category: "Music Art",
-      exploreLink: "/explore",
-      buttonText: "Explore Genesis"
-    },
-    {
-      id: 4,
-      title: "Worldwide Artwork Ground",
-      image: "assets/images/collection-01.jpg",
-      items: "426/468",
-      category: "Blockchain",
-      exploreLink: "/explore",
-      buttonText: "Explore Worldwide"
-    }
-  ];
+  const [collections, setCollections] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/nft-collections")  // FastAPI backend URL
+      .then((response) => response.json())
+      .then((data) => setCollections(data))
+      .catch((error) => console.error("Error fetching NFT collections:", error));
+  }, []);
 
   const CustomPrevArrow = ({ onClick }) => (
     <button
@@ -97,6 +67,7 @@ const CollectionCarousel = () => {
           .collections .item img {
             border-top-right-radius: 20px;
             border-top-left-radius: 20px;
+            max-height: 300px;
           }
 
           .collections .item .down-content {
@@ -160,8 +131,8 @@ const CollectionCarousel = () => {
         
         <div className="collections relative px-12">
           <Slider {...settings}>
-            {collections.map((collection) => (
-              <div key={collection.id} className="item p-4">
+            {collections.map((collection, index) => (
+              <div key={index} className="item p-4">
                 <div className="">
                   <img
                     src={collection.image}

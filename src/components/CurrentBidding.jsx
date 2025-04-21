@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const CurrentBidding = () => {
   const containerStyle = {
@@ -76,6 +77,10 @@ const CurrentBidding = () => {
     fontStyle: 'normal',
     fontWeight: '700',
   };
+  const leftImgStyle = {
+    flexBasis: '80%',
+    display: 'inline-flex',
+  };
 
   const dateStyle = {
     fontSize: '15px',
@@ -83,33 +88,53 @@ const CurrentBidding = () => {
   };
 
   // State for items and sorting
-  const [sortOrder, setSortOrder] = useState('latest');
-  const [items, setItems] = useState([
-    { id: 1, img: 'current-01.jpg', name: 'David Walker', username: '@davidwalker', bid: 0.02, date: '2021-07-24T22:00:00' },
-    { id: 2, img: 'current-02.jpg', name: 'David Walker', username: '@davidwalker', bid: 0.03, date: '2022-07-24T22:00:00' },
-    { id: 3, img: 'current-03.jpg', name: 'David Walker', username: '@davidwalker', bid: 0.04, date: '2023-07-24T22:00:00' },
-    { id: 4, img: 'current-02.jpg', name: 'David Walker', username: '@davidwalker', bid: 0.05, date: '2024-07-24T22:00:00' },
-    { id: 5, img: 'current-04.jpg', name: 'David Walker', username: '@davidwalker', bid: 0.06, date: '2025-07-24T22:00:00' },
-    { id: 6, img: 'current-01.jpg', name: 'David Walker', username: '@davidwalker', bid: 0.07, date: '2022-08-24T22:00:00' },
-  ]);
+  const [sortOrder, setSortOrder] = useState("latest");
+  const [items, setItems] = useState([]);
+  const [nftImages, setNftImages] = useState({}); // 👈 Store NFT images
 
-  // Sort items based on the selected sort order
+  // Fetch transactions from FastAPI
+  useEffect(() => {
+    const fetchBids = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/transactions");
+        setItems(response.data);
+
+        // Fetch NFT images for each transaction
+        const nftData = {};
+        await Promise.all(
+          response.data.map(async (item) => {
+            try {
+              const nftResponse = await axios.get(`http://127.0.0.1:8000/nfts/${item.item_id}`);
+              nftData[item.item_id] = nftResponse.data.img_url;
+            } catch (error) {
+              console.error("Error fetching NFT data:", error);
+              nftData[item.item_id] = "assets/images/placeholder.png"; // Fallback image
+            }
+          })
+        );
+
+        setNftImages(nftData);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchBids();
+  }, []);
+
+  // Sorting function
   const sortedItems = [...items].sort((a, b) => {
-    if (sortOrder === 'latest') {
-      return new Date(b.date) - new Date(a.date); // Latest first
-    } else if (sortOrder === 'old') {
-      return new Date(a.date) - new Date(b.date); // Oldest first
-    } else if (sortOrder === 'low') {
-      return a.bid - b.bid; // Lowest bid first
-    } else if (sortOrder === 'high') {
-      return b.bid - a.bid; // Highest bid first
+    if (sortOrder === "latest") {
+      return new Date(b.bid_time) - new Date(a.bid_time);
+    } else if (sortOrder === "old") {
+      return new Date(a.bid_time) - new Date(b.bid_time);
+    } else if (sortOrder === "low") {
+      return parseFloat(a.bid_amount) - parseFloat(b.bid_amount);
+    } else if (sortOrder === "high") {
+      return parseFloat(b.bid_amount) - parseFloat(a.bid_amount);
     }
     return 0;
   });
-
-  const handleSortChange = (event) => {
-    setSortOrder(event.target.value);
-  };
 
   return (
     <div className="col-lg-12" style={containerStyle}>
@@ -123,13 +148,12 @@ const CurrentBidding = () => {
           <div className="col-lg-6">
             <fieldset>
               <select
-                name="Category"
                 className="form-select"
                 aria-label="Default select example"
-                id="chooseCategory"
                 style={selectStyle}
                 value={sortOrder}
-                onChange={handleSortChange}
+                onChange={(e) => setSortOrder(e.target.value)}
+
               >
                 <option value="latest" style={{color: 'black'}}>Sort By: Latest</option>
                 <option value="old" style={{color: 'black'}}>Sort By: Oldest</option>
@@ -142,15 +166,25 @@ const CurrentBidding = () => {
             {sortedItems.map((item) => (
               <div className="col-lg-4 col-md-6" key={item.id}>
                 <div className="item" style={itemStyle}>
-                  <div className="left-img">
-                    <img src={`assets/images/${item.img}`} alt={`Bid Item ${item.id}`} />
+                  <div className="left-img" style={leftImgStyle}>
+                  
+                      <img 
+                        src={nftImages[item.item_id]}
+                        alt={`NFT ${item.item_name}`} 
+
+                        style={leftImgStyle}
+                      />
+                    
                   </div>
                   <div className="right-content" style={rightContentStyle}>
-                    <h4 style={rightContentH4Style}>{item.name}</h4>
-                    <a href="#" style={rightContentLinkStyle}>{item.username}</a>
+                    <h4 style={rightContentH4Style}>{item.item_name}</h4>
+                    <a href="#" style={rightContentLinkStyle}>
+                      {item.owner_wallet.slice(0, 6)}...{item.owner_wallet.slice(-4)}
+                      <br /> {/* 👈 Forces the address onto a new line if needed */}
+                    </a>
                     <div className="line-dec" style={lineDecStyle}></div>
-                    <h6 style={rightContentH6Style}>Bid: <em style={rightContentH6EmStyle}>{item.bid} ETH</em></h6>
-                    <span className="date" style={dateStyle}>{new Date(item.date).toLocaleDateString()}</span>
+                    <h6 style={rightContentH6Style}>Bid: <em style={rightContentH6EmStyle}>{item.bid_amount} ETH</em></h6>
+                    <span className="date" style={dateStyle}>{new Date(item.bid_time).toLocaleString()}</span>
                   </div>
                 </div>
               </div>

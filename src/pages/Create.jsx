@@ -1,49 +1,201 @@
 import React, { useState } from 'react';
 
 function Create() {
+  const categories = ["Music Art", "Digital Art", "Blockchain", "Virtual"];
   const [isActive, setIsActive] = useState(false);
-        const [isMenuVisible, setIsMenuVisible] = useState(false);
-    
-        const handleClick = () => {
-            setIsActive(!isActive); // Toggle the 'active' class
-            setIsMenuVisible(!isMenuVisible); // Toggle menu visibility
-        };
-        const [showWallet, setShowWallet] = useState(false); // Controls the pop-up visibility
-        const handleSubmit = (e) => {
-          e.preventDefault();
-          setShowWallet(true); // Show the wallet pop-up on submit
-        };
-      
-        const handleConfirm = () => {
-          alert(`Connection Confirmed `);
-          setShowWallet(false); // Close the pop-up
-        };
-      
-        const handleCancel = () => {
-          alert('Connection Canceled');
-          setShowWallet(false); // Close the pop-up
-        };
-        const transactionStyle = {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 0',
-          borderBottom: '1px solid black',
-          width: '270px',
-          marginLeft: '30px'
-        };
-      
-        const transactionIconStyle = {
-          backgroundColor: '#1a4f7c',
-          padding: '8px',
-          borderRadius: '8px',
-          marginRight: '12px',
-        };
-        const confirmedStyle = {
-          color: '#2ecc71',
-          fontSize: '14px',
-          marginTop: '4px',
-        };
+            const [isMenuVisible, setIsMenuVisible] = useState(false);
+        
+            const handleClick = () => {
+                setIsActive(!isActive); // Toggle the 'active' class
+                setIsMenuVisible(!isMenuVisible); // Toggle menu visibility
+            };
+  const [walletAddress, setWalletAddress] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    username: "",
+    price: "",
+    category: categories[0], // Default category
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    file: null,
+  });
+  const [ownedNFTs, setOwnedNFTs] = useState([]); // Store NFTs owned by the user
+  const [transactions, setTransactions] = useState([]); // Store transaction history
+  const [ipfsUrl, setIpfsUrl] = useState(""); // Store IPFS URL
+  const [authorImage, setAuthorImage] = useState(null);
+  const [authorImageUrl, setAuthorImageUrl] = useState("");
+
+  // Function to connect to MetaMask and fetch NFT & Transaction data
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        const connectedWallet = accounts[0];
+        setWalletAddress(connectedWallet);
+
+        // Fetch NFTs owned by this wallet
+        fetchOwnedNFTs(connectedWallet);
+
+        // Fetch transaction history for this wallet
+        fetchTransactions(connectedWallet);
+      } catch (error) {
+        console.error("Error connecting to wallet:", error);
+        alert("Failed to connect wallet!");
+      }
+    } else {
+      alert("MetaMask not detected! Please install MetaMask.");
+    }
+  };
+  // Function to fetch NFTs owned by the connected wallet
+  const fetchOwnedNFTs = async (wallet) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/nfts/owner/${wallet}`);
+      if (response.ok) {
+        const nfts = await response.json();
+        setOwnedNFTs(nfts);
+      } else {
+        console.error("Failed to fetch NFTs");
+      }
+    } catch (error) {
+      console.error("Error fetching NFTs:", error);
+    }
+  };
+  // Function to fetch transaction history of the connected wallet
+  const fetchTransactions = async (wallet) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/transactions/owner/${wallet}`);
+      if (response.ok) {
+        const txs = await response.json();
+        setTransactions(txs);
+      } else {
+        console.error("Failed to fetch transactions");
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, file: e.target.files[0] });
+  };
+  const uploadToIPFS = async () => {
+    if (!formData.file) {
+      alert("Please select a file first.");
+      return null;
+    }
+  
+    const data = new FormData();
+    data.append("file", formData.file); // ✅ Append file correctly
+  
+    try {
+      const response = await fetch("http://127.0.0.1:8000/upload/", {
+        method: "POST",
+        body: data,
+      });
+  
+      const result = await response.json();
+      if (result.ipfs_url) {
+        setIpfsUrl(result.ipfs_url); // ✅ Store the IPFS URL
+        return result.ipfs_url;
+      } else {
+        alert("Failed to upload image to IPFS.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading to IPFS:", error);
+      alert("Error uploading image.");
+      return null;
+    }
+  };
+  const handleAuthorImageChange = (e) => {
+    setAuthorImage(e.target.files[0]);
+  };
+
+  const uploadAuthorImageToIPFS = async () => {
+      if (!authorImage) {
+          alert("Please select an author image first.");
+          return null;
+      }
+
+      const data = new FormData();
+      data.append("file", authorImage);
+
+      try {
+          const response = await fetch("http://127.0.0.1:8000/upload_author_image/", {
+              method: "POST",
+              body: data,
+          });
+
+          const result = await response.json();
+          if (result.ipfs_url) {
+              setAuthorImageUrl(result.ipfs_url);
+              return result.ipfs_url;
+          } else {
+              alert("Failed to upload author image.");
+              return null;
+          }
+      } catch (error) {
+          console.error("Error uploading author image:", error);
+          alert("Error uploading author image.");
+          return null;
+      }
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!walletAddress) {
+      alert("Please connect your wallet first!");
+      return;
+    }
+  
+    const ipfsImageUrl = await uploadToIPFS();
+    if (!ipfsImageUrl) return; // ✅ Stop if upload fails
+  
+    const authorImageIPFS = await uploadAuthorImageToIPFS();
+    if (!authorImageIPFS) return;
+  
+
+    const data = new FormData();
+    data.append("title", formData.title);
+    data.append("description", formData.description);
+    data.append("username", formData.username);
+    data.append("price", formData.price);
+    data.append("author_wallet", walletAddress);
+    data.append("image_url", ipfsImageUrl); // ✅ Send IPFS URL instead of file
+    data.append("author_image", authorImageIPFS); // ✅ Send author image IPFS URL
+    data.append("category", formData.category);
+    data.append("days", formData.days);
+    data.append("hours", formData.hours);
+    data.append("minutes", formData.minutes);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/add_nft/", {
+        method: "POST",
+        body: data,
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        alert(`NFT Added! ID: ${result.nft_id}`);
+      } else {
+        const errorText = await response.text();
+        alert("Failed to add NFT: " + errorText);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error adding NFT");
+    }
+  };
+  
+        
+  
 
   return (
     <>
@@ -140,6 +292,14 @@ function Create() {
             </div>
           </div>
           <div className="col-lg-12">
+            {/* Connect Wallet Button */}
+            <button
+              onClick={connectWallet}
+              className="mb-4 w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+              style={{ color: "black", backgroundColor: "black"}}
+            >
+              {walletAddress ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}` : "Connect Wallet"}
+            </button>
             <form id="contact" action="" onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-lg-4">
@@ -149,6 +309,8 @@ function Create() {
                       type="text"
                       name="title"
                       id="title"
+                      value={formData.title}
+                      onChange={handleChange}
                       placeholder="Ex. Lyon King"
                       autoComplete="on"
                       required
@@ -163,10 +325,23 @@ function Create() {
                       type="text"
                       name="description"
                       id="description"
+                      value={formData.description}
+                      onChange={handleChange}
                       placeholder="Give us your idea"
                       autoComplete="on"
                       required
                     />
+                  </fieldset>
+                </div>
+                <div className="col-lg-4">
+                  <fieldset>
+                    <label htmlFor="Categories">Categories</label>
+                    {/* ✅ Category Dropdown */}
+                    <select name="category" value={formData.category} onChange={handleChange}>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                    </select>
                   </fieldset>
                 </div>
                 <div className="col-lg-4">
@@ -176,6 +351,8 @@ function Create() {
                       type="text"
                       name="username"
                       id="username"
+                      value={formData.username}
+                      onChange={handleChange}
                       placeholder="Ex. @alansmithee"
                       autoComplete="on"
                       required
@@ -189,6 +366,8 @@ function Create() {
                       type="text"
                       name="price"
                       id="price"
+                      value={formData.price}
+                      onChange={handleChange}
                       placeholder="Price depends on quality. Ex. 0.06 ETH"
                       autoComplete="on"
                       required
@@ -210,8 +389,26 @@ function Create() {
                 </div>
                 <div className="col-lg-4">
                   <fieldset>
+                    <label htmlFor="file">Your Author Image</label>
+                    <input type="file" id="file" name="myfiles[]" multiple onChange={handleAuthorImageChange} />
+                    
+                  </fieldset>
+                </div>
+                <div className="col-lg-4">
+                  <fieldset>
                     <label htmlFor="file">Your File</label>
-                    <input type="file" id="file" name="myfiles[]" multiple />
+                    <input type="file" id="file" name="myfiles[]" multiple onChange={handleFileChange} />
+                    
+                  </fieldset>
+                </div>
+                <div className="col-lg-4">
+                  <fieldset>
+                    <label htmlFor="time">Bidding Time</label>
+                    {/* ✅ Bidding Time Inputs */}
+                    <input type="number" name="days" placeholder="Days" value={formData.days || ""} onChange={handleChange} />
+                    <input type="number" name="hours" placeholder="Hours" value={formData.hours || ""} onChange={handleChange} />
+                    <input type="number" name="minutes" placeholder="Minutes" value={formData.minutes || ""} onChange={handleChange} />
+                    
                   </fieldset>
                 </div>
                 <div className="col-lg-8">
@@ -221,110 +418,61 @@ function Create() {
                       id="form-submit"
                       className="orange-button"
                     >
-                      Submit and connect your wallet
+                      Create NFT
                     </button>
                   </fieldset>
                 </div>
-                <h4>Your transaction history</h4>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
+                {/* Owned NFTs Section */}
+                {ownedNFTs.length > 0 && (
+                  <div>
+                    <h2 className="text-xl font-bold mt-6 mb-2" style={{  padding: "5px", color: "white" }}>Your NFTs</h2>
+                    {ownedNFTs.map((nft) => (
+                      <div key={nft.id} className="mb-4 p-3 border rounded">
+                        <h2 style={{  padding: "5px", color: "white" }}>{nft.item_name}</h2>
+                        <p style={{ color: "white" }}>{nft.item_description}</p>
+                        <p style={{ color: "white" }}>Author: {nft.author} (@{nft.author_wallet})</p>
+                        <p style={{ color: "white" }}>Owner: {nft.owner_wallet}</p>
+                        <p style={{ color: "white" }}>
+                          Current Bid: <strong>{nft.current_bid} ETH</strong>
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.02 ETH?</div>
-                    <div style={{ color: 'red' }}>$2750.45</div>
+                )}
+
+                {/* Transaction History Section */}
+                {transactions.length > 0 && (
+                  <div>
+                    <h2 className="text-xl font-bold mt-6 mb-2" style={{  padding: "5px", color: "black" }}>Transaction History</h2>
+                    {transactions.map((tx) => (
+                      <div key={tx.id} className="mb-4 p-3 border rounded">
+                        <p style={{ color: "white" }}>
+                          <strong>NFT:</strong> {tx.item_name}
+                        </p>
+                        <p style={{ color: "white" }}>
+                          <strong>Bid Amount:</strong> {tx.bid_amount} ETH
+                        </p>
+                        <p style={{ color: "white" }}>
+                          <strong>Bid Time:</strong> {new Date(tx.bid_time).toLocaleString()}
+                        </p>
+                        <p style={{ color: "white" }}>
+                          <strong>Owner Wallet:</strong> {tx.owner_wallet}
+                        </p>
+                        <p style={{ color: "white" }}>
+                          <strong>Transaction Hash:</strong>{" "}
+                          <a
+                            href={`https://etherscan.io/tx/${tx.transaction_hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "blue" }}
+                          >
+                            {tx.transaction_hash}
+                          </a>
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                  
-                </div>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.006 ETH?</div>
-                    <div style={{ color: 'red' }}>$1040.25</div>
-                  </div>
-                  
-                </div>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.01 ETH?</div>
-                    <div style={{ color: 'red' }}>$3758.64</div>
-                  </div>
-                  
-                </div>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.0003 ETH?</div>
-                    <div style={{ color: 'red' }}>$2008.11</div>
-                  </div>
-                  
-                </div>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.02 ETH?</div>
-                    <div style={{ color: 'red' }}>$2750.45</div>
-                  </div>
-                  
-                </div>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.0009 ETH?</div>
-                    <div style={{ color: 'red' }}>$750.45</div>
-                  </div>
-                  
-                </div>
-                <div style={transactionStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={transactionIconStyle}>↕️</span>
-                    <div>
-                      <div style={{color: 'white'}}>Buy Asset</div>
-                      <div style={confirmedStyle}>Available</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{color: 'orange'}}>bidding 0.02 ETH?</div>
-                    <div style={{ color: 'red' }}>$2750.45</div>
-                  </div>
-                  
-                </div>
-                
+                )}
               </div>
             </form>
           </div>
@@ -337,16 +485,17 @@ function Create() {
             </div>
           </div>
           <div className="col-lg-7">
-            <div className="left-image">
-              <img
-                src="assets/images/create-yours.jpg"
-                alt=""
-                style={{ borderRadius: "20px" }}
-              />
-            </div>
+            
+              {ipfsUrl && (
+              <div className="left-image">
+                <p>IPFS URL: <a href={ipfsUrl} target="_blank">{ipfsUrl}</a></p>
+                <img src={ipfsUrl} alt="Uploaded NFT" style={{ borderRadius: "20px" }} />
+              </div>
+            )}
+            
           </div>
           <div className="col-lg-5 align-self-center">
-            <h4>Dolores Haze Westworld Eye</h4>
+            <h4>Item Name</h4>
             <span className="author">
               <img
                 src="assets/images/author-02.jpg"
@@ -354,12 +503,12 @@ function Create() {
                 style={{ maxWidth: "50px", borderRadius: "50%" }}
               />
               <h6>
-                Kataleya Smithee<br />
-                <a href="#">@kataleey</a>
+                Author name<br />
+                <a href="#">@author wallet</a>
               </h6>
             </span>
             <p>
-              Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do
+              Description: Lorem ipsum dolor sit amet, consectetu dipiscingei elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
             <div className="row">
@@ -389,6 +538,7 @@ function Create() {
               </div>
             </div>
           </div>
+          
         </div>
       </div>
     </div>
@@ -413,220 +563,10 @@ function Create() {
         </div>
       </div>
     </footer>
-    {/* Wallet Pop-Up */}
-    {showWallet && (
-        <WalletPopup
-          onConfirm={handleConfirm}
-          onCancel={handleCancel}
-        />
-      )}
+    
   </>
   
   )
 }
 
 export default Create
-const WalletPopup = ({ bidAmount, balance, onConfirm, onCancel }) => {
-  const walletStyle = {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#1E1E1E', // Darker background to match image
-    padding: '24px',
-    borderRadius: '16px',
-    color: '#fff',
-    width: '360px',
-    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
-    zIndex: 1000,
-  };
-
-  const overlayStyle = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    backdropFilter: 'blur(4px)',
-    zIndex: 999,
-  };
-
-  const headerStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-  };
-
-  const balanceStyle = {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    marginBottom: '8px',
-  };
-
-  const portfolioStyle = {
-    color: '#3498db',
-    textDecoration: 'none',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-  };
-
-  const actionsContainerStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '24px',
-    marginBottom: '32px',
-  };
-
-  const actionButtonStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '8px',
-    background: 'none',
-    border: 'none',
-    color: '#fff',
-    cursor: 'pointer',
-  };
-
-  const actionIconStyle = {
-    backgroundColor: '#1a4f7c',
-    padding: '12px',
-    borderRadius: '50%',
-    width: '48px',
-    height: '48px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-
-  const tabsStyle = {
-    display: 'flex',
-    gap: '24px',
-    borderBottom: '1px solid #333',
-    marginBottom: '20px',
-  };
-
-  const tabStyle = {
-    padding: '8px 0',
-    color: '#666',
-    borderBottom: '2px solid transparent',
-    cursor: 'pointer',
-  };
-
-  const activeTabStyle = {
-    ...tabStyle,
-    color: '#3498db',
-    borderBottom: '2px solid #3498db',
-  };
-
-  const transactionStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '12px 0',
-    borderBottom: '1px solid #333',
-  };
-
-  const transactionIconStyle = {
-    backgroundColor: '#1a4f7c',
-    padding: '8px',
-    borderRadius: '8px',
-    marginRight: '12px',
-  };
-
-  const confirmedStyle = {
-    color: '#2ecc71',
-    fontSize: '14px',
-    marginTop: '4px',
-  };
-  const buttonStyle = {
-    padding: '10px 20px',
-    margin: '10px',
-    borderRadius: '5px',
-    border: 'none',
-    cursor: 'pointer',
-  };
-
-  const confirmButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#7453fc',
-    color: '#fff',
-  };
-
-  const cancelButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#ff4d4d',
-    color: '#fff',
-  };
-  return (
-    <>
-      <div style={overlayStyle}></div>
-      <div style={walletStyle}>
-        <div style={headerStyle}>
-          <h3>Account 2</h3>
-          <div style={{ color: '#666' }}>0x8626f...C1199</div>
-        </div>
-
-        <div style={balanceStyle}>$30.033.00 USD</div>
-        <div style={{ marginBottom: '20px' }}>
-          <span style={{ color: '#666' }}>+$5 (+0.03%) </span>
-          <a href="#" style={portfolioStyle}>Portfolio ↗</a>
-        </div>
-
-        <div style={actionsContainerStyle}>
-          <button style={actionButtonStyle}>
-            <span style={actionIconStyle}>↕️</span>
-            <span>Buy</span>
-          </button>
-          <button style={actionButtonStyle}>
-            <span style={actionIconStyle}>⇄</span>
-            <span>Swap</span>
-          </button>
-          <button style={actionButtonStyle}>
-            <span style={actionIconStyle}>⇌</span>
-            <span>Sell</span>
-          </button>
-          <button style={actionButtonStyle}>
-            <span style={actionIconStyle}>➚</span>
-            <span>Send</span>
-          </button>
-          <button style={actionButtonStyle}>
-            <span style={actionIconStyle}>⊞</span>
-            <span>Receive</span>
-          </button>
-        </div>
-
-        <div style={tabsStyle}>
-          <span style={tabStyle}>Tokens</span>
-          <span style={tabStyle}>NFTs</span>
-          <span style={activeTabStyle}>Activity</span>
-        </div>
-
-        <div style={transactionStyle}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={transactionIconStyle}>↕️</span>
-            <div>
-              <div>Connect</div>
-              <div style={confirmedStyle}>Available</div>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div></div>
-            <div style={{ color: '#666' }}></div>
-          </div>
-          
-        </div>
-        <button style={cancelButtonStyle} onClick={onCancel}>
-            Cancel
-          </button>
-          <button style={confirmButtonStyle} onClick={onConfirm}>
-            Confirm
-          </button>
-      </div>
-    </>
-  );
-};
-

@@ -3,8 +3,7 @@ import Web3 from "web3";
 import contractABI from "../contractABI.json";
 import contractAddress from "../config"; // Ensure correct import
 
-
-const ItemDetails = () => {
+const Test = () => {
   const [nfts, setNfts] = useState([]);
   const [bidAmounts, setBidAmounts] = useState({});
   const [account, setAccount] = useState("");
@@ -174,169 +173,90 @@ const ItemDetails = () => {
   if (nfts.length === 0) return <p style={{ color: "black" }}>Loading NFTs...</p>;
   
 
-  // Inline styles for the page
-  const pageStyle = {
-    backgroundImage: 'url(../images/dark-bg.jpg)',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center center',
-    backgroundSize: 'cover',
-    padding: '120px 0',
-    position: 'relative',
-  };
-
-  const afterStyle = {
-    backgroundImage: 'url(/assets/images/category-collection-dec.png)',
-    width: '300px',
-    height: '282px',
-    position: 'absolute',
-    bottom: '0',
-    right: '30px',
-    content: "''",
-    zIndex: 1,
-  };
-
-  const imageStyle = {
-    borderRadius: '20px',
-  };
-
-  const authorImageStyle = {
-    maxWidth: '50px',
-    borderRadius: '50%',
-  };
-
-  const bidStyle = {
-    fontSize: '14px',
-  };
-
-  const ownerStyle = {
-    fontSize: '14px',
-  };
-
-  const endsStyle = {
-    fontSize: '14px',
-  };
-
-  const buttonStyle = {
-    fontSize: '14px',
-    color: '#fff',
-    backgroundColor: '#7453fc',
-    border: '1px solid #7453fc',
-    padding: '12px 30px',
-    display: 'inline-block',
-    borderRadius: '25px',
-    fontWeight: '500',
-    textTransform: 'capitalize',
-    letterSpacing: '0.5px',
-    transition: 'all .3s',
-    position: 'relative',
-    overflow: 'hidden',
-  };
-
-  const buttonHoverStyle = {
-    backgroundColor: '#fff',
-    color: '#7453fc',
-    border: '1px solid #fff',
-  };
-
   return (
-    <div className="item-details-page" style={pageStyle}>
-      <button onClick={connectWallet} style={{ color: "orange", padding: "10px", border: "1px solid black", position: "absolute"}}>
+    <div style={{ color: "black" }}>
+      <button onClick={connectWallet} style={{ color: "black", padding: "10px", border: "1px solid black" }}>
         {account ? `Connected: ${account}` : "Connect MetaMask"}
       </button>
-      {nfts.map((nft) => (
-        <div key={nft.id} className="row" style={{marginBottom: "50px" }}>
-          <div className="col-lg-7">
-            <div className="left-image">
-              {/* NFT Image */}
-              {nft.img_url ? (
-                <img
-                  src={nft.img_url}
-                  alt="NFT Preview"
-                  style={imageStyle}
-                />
-              ) : (
-                <p style={{ color: "black" }}>No Image Available</p>
-              )}
-            </div>
-          </div>
-          <div className="col-lg-5 align-self-center">
-            <h4>{nft.item_name}</h4>
-            <span className="author">
-              {nft.author_image ? (
-              <img
-                src={nft.author_image}
-                alt={`${nft.author}'s profile`}
-                style={authorImageStyle}
-              />
-              ) : (
-                <p style={{ color: "black", marginRight: "10px" }}>No Author Image</p>
-              )}
-              <h6>
-              Author: {nft.author} <br />
-                <a href="#">(@{nft.author_wallet})</a>
-              </h6>
-            </span>
-            <p>
-            {nft.item_description}
-            </p>
-            <div className="row">
-              <div className="col-3">
-                <span className="bid" style={bidStyle}>
-                  Current Bid: <strong>{nft.current_bid} ETH</strong>
-                </span>
-              </div>
-              <div className="col-4">
-                <span className="owner" style={ownerStyle}>
-                  Owner<br />
-                  <strong>{nft.owner_wallet}</strong><br />
-                  <em>@{nft.owner_wallet}</em>
-                </span>
-              </div>
 
-            </div>
-            {countdowns[nft.id] !== "Auction Ended" ? (
-            <form onSubmit={(e) => placeBid(e, nft)}>
-              <label htmlFor="quantity-text">Place Bid:</label>
-                <input 
-                placeholder="Enter bid" 
-                className="quantity-text" 
-                value={bidAmounts[nft.id] || ""} 
-                onChange={(e) => handleBidChange(nft.id, e.target.value)}
-              />
-              <button
-                type="submit"
-                id="form-submit"
-                className="main-button"
-                style={buttonStyle}
-                onMouseOver={e => e.target.style = buttonHoverStyle}
-                onMouseOut={e => e.target.style = buttonStyle}
-              >
-                Submit Bid
-              </button>
-              {/* Countdown Timer */}
-              <p style={{ color: "red", fontWeight: "bold" }}>
-                Time Left: {countdowns[nft.id] || "Calculating..."}
-              </p>
-            </form>
+      {nfts.map((nft) => (
+        <div
+          key={nft.id}
+          style={{
+            border: "1px solid black",
+            padding: "15px",
+            margin: "10px",
+            borderRadius: "10px",
+            color: "black",
+          }}
+        >
+        {/* NFT Image */}
+        {nft.img_url ? (
+            <img
+              src={nft.img_url}
+              alt="NFT Preview"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxWidth: "300px",
+                borderRadius: "10px",
+                marginBottom: "10px",
+              }}
+            />
           ) : (
-            <p style={{ color: "red", fontWeight: "bold" }}>Bidding has ended</p>
+            <p style={{ color: "black" }}>No Image Available</p>
           )}
-          </div>
+          {nft.author_image ? (
+            <img
+              src={nft.author_image}
+              alt={`${nft.author}'s profile`}
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                marginRight: "10px",
+              }}
+            />
+          ) : (
+            <p style={{ color: "black", marginRight: "10px" }}>No Author Image</p>
+          )}
+          <h2 style={{ backgroundColor: "black", padding: "5px" }}>{nft.item_name}</h2>
+          <p style={{ color: "black" }}>{nft.item_description}</p>
+          <p style={{ color: "black" }}>Author: {nft.author} (@{nft.author_wallet})</p>
+          <p style={{ color: "black" }}>Owner: {nft.owner_wallet}</p>
+          <p style={{ color: "black" }}>
+            Current Bid: <strong>{nft.current_bid} ETH</strong>
+          </p>
+          {/* Countdown Timer */}
+          <p style={{ color: "red", fontWeight: "bold" }}>
+            Time Left: {countdowns[nft.id] || "Calculating..."}
+          </p>
+          {countdowns[nft.id] !== "Auction Ended" ? (
+          <form onSubmit={(e) => placeBid(e, nft)}>
+            <input
+              type="text"
+              placeholder="Enter bid in ETH"
+              value={bidAmounts[nft.id] || ""}
+              onChange={(e) => handleBidChange(nft.id, e.target.value)}
+              style={{
+                color: "black",
+                border: "1px solid black",
+                padding: "5px",
+                marginRight: "10px",
+              }}
+            />
+            <button type="submit" style={{ color: "black", border: "1px solid black", padding: "5px 10px" }}>
+              Submit Bid
+            </button>
+          </form>
+        ) : (
+          <p style={{ color: "gray", fontWeight: "bold" }}>Bidding has ended</p>
+        )}
         </div>
       ))}
-
-      
-      
-      
-      <div style={afterStyle}></div>
     </div>
-    
-
-
   );
 };
 
-export default ItemDetails;
-
-
-
+export default Test;
